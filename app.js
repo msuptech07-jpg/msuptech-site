@@ -64,25 +64,67 @@
     return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
   }
 
-  function url(cfg, uf) {
-    return BASE + "/" + CICLO + "/" + cfg.eleicao + "/dados-simplificados/" + uf + "/" +
-      uf + "-c" + cfg.cargo + "-e" + cfg.eleicao.padStart(6, "0") + "-r.json";
+  // Em 2026 o TSE publica o resultado completo em dados/<uf>/<uf>-cCCCC-eEEEEEE-u.json.
+  // O formato "dados-simplificados" (-r.json) de 2022/2024 fica como alternativa.
+  function url(cfg, uf, tipo) {
+    var arq = uf + "-c" + cfg.cargo + "-e" + cfg.eleicao.padStart(6, "0");
+    return BASE + "/" + CICLO + "/" + cfg.eleicao +
+      (tipo === "r" ? "/dados-simplificados/" + uf + "/" + arq + "-r.json" : "/dados/" + uf + "/" + arq + "-u.json");
   }
 
   function urlFoto(cfg, uf, sqcand) {
     return BASE + "/" + CICLO + "/" + cfg.eleicao + "/fotos/" + uf + "/" + sqcand + ".jpeg";
   }
 
+  // Converte o arquivo completo de 2026 (seções em "s", eleitorado em "e", votos em "v",
+  // candidatos dentro de carg > agr > par) para o mesmo formato plano usado no resto da página.
+  function normalizar(d) {
+    if (!d) return null;
+    if (Array.isArray(d.cand)) return d;
+    if (!Array.isArray(d.carg) || !d.carg[0]) return null;
+    var s = d.s || {}, e = d.e || {}, v = d.v || {};
+    var cand = [];
+    (d.carg[0].agr || []).forEach(function (a) {
+      (a.par || []).forEach(function (p) {
+        (p.cand || []).forEach(function (c) {
+          var x = Object.assign({}, c);
+          x.nm = c.nmu || c.nm;      // nome de urna
+          x.nmc = c.nm;              // nome completo
+          x.cc = p.sg + (a.tp === "c" && a.nm ? " · " + a.nm : "");
+          cand.push(x);
+        });
+      });
+    });
+    return {
+      dg: d.dg, hg: d.hg, dt: d.dt, ht: d.ht, tf: d.tf, md: d.md,
+      s: s.ts, st: s.st, pst: s.pst,
+      e: e.te, c: e.c, pc: e.pc, a: e.a, pa: e.pa,
+      // "pvv" do TSE é válidos sobre válidos (100%). Recalcula sobre o total de votos (válidos +
+      // brancos + nulos), a mesma base de pvb e ptvn; no Senado cada eleitor dá 2 votos.
+      vv: v.vv, pvv: totalVotos(v) > 0 ? String(num(v.vv) / totalVotos(v) * 100).replace(".", ",") : v.pvv,
+      vb: v.vb, pvb: v.pvb, tvn: v.tvn, ptvn: v.ptvn,
+      cand: cand
+    };
+  }
+
+  function totalVotos(v) {
+    return (num(v.vv) || 0) + (num(v.vb) || 0) + (num(v.tvn) || 0);
+  }
+
   // Resolve com os dados, ou null se o TSE ainda não publicou o arquivo.
   // "no-cache" faz o navegador revalidar no servidor em vez de reaproveitar a cópia local.
-  function buscar(cfg, uf) {
-    return fetch(url(cfg, uf), { cache: "no-cache" }).then(function (r) {
+  function baixar(endereco) {
+    return fetch(endereco, { cache: "no-cache" }).then(function (r) {
       if (r.status === 404 || r.status === 403) return null;
       if (!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
-    }).then(function (d) {
-      return d && Array.isArray(d.cand) ? d : null;
     });
+  }
+
+  function buscar(cfg, uf) {
+    return baixar(url(cfg, uf, "u")).then(function (d) {
+      return d ? d : baixar(url(cfg, uf, "r"));
+    }).then(normalizar);
   }
 
   // ---------- leitura do resultado ----------
@@ -317,7 +359,6 @@
     if (c.sqcand) {
       var img = new Image();
       img.alt = "";
-      img.loading = "lazy";
       img.onload = function () { foto.textContent = ""; foto.appendChild(img); };
       img.src = urlFoto(cfg, uf === "zz" ? "br" : uf, c.sqcand);
     }
@@ -344,17 +385,20 @@
 
   // ---------- pesquisas x apuração ----------
 
+  // Procura primeiro pelo nome de urna; só se não achar, tenta o nome completo.
   function casar(candPesquisa, lista) {
     if (!lista) return null;
-    for (var i = 0; i < lista.length; i++) {
-      var palavras = semAcento(nomeDe(lista[i])).split(/[^A-Z0-9]+/);
-      var ok = candPesquisa.chaves.some(function (chave) {
+    function bate(texto) {
+      var palavras = semAcento(texto).split(/[^A-Z0-9]+/);
+      return candPesquisa.chaves.some(function (chave) {
         return chave.every(function (p) { return palavras.indexOf(p) !== -1; });
       });
-      if (ok) return lista[i];
     }
+    for (var i = 0; i < lista.length; i++) if (bate(nomeDe(lista[i]))) return lista[i];
+    for (var k = 0; k < lista.length; k++) if (lista[k].nmc && bate(lista[k].nmc)) return lista[k];
     return null;
   }
+
 
   function media(cand, institutos) {
     var vals = institutos.map(function (i) { return cand.v[i.id]; }).filter(function (v) { return typeof v === "number"; });
