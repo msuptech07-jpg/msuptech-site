@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apuração Eleições 2026</title>
+  <meta name="description" content="Acompanhe ao vivo a apuração das Eleições 2026 com dados oficiais do TSE: Presidente, Governador e Senador.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="wrap">
+      <h1>Apuração <span>Eleições 2026</span></h1>
+      <p class="sub">1º turno · 4 de outubro de 2026 · dados oficiais do TSE</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="cargos" role="tablist" aria-label="Cargo">
+      <button role="tab" data-cargo="presidente">Presidente</button>
+      <button role="tab" data-cargo="governador">Governador</button>
+      <button role="tab" data-cargo="senador">Senador</button>
+    </nav>
+
+    <div class="filtros">
+      <label for="uf">Abrangência</label>
+      <select id="uf"></select>
+      <button id="atualizar" type="button">Atualizar</button>
+      <span id="relogio" class="relogio" aria-live="polite"></span>
+    </div>
+
+    <section id="resumo" class="resumo" hidden>
+      <div class="progresso">
+        <div class="progresso-topo">
+          <strong id="pst">0,00%</strong> <span>das seções totalizadas</span>
+          <span id="status" class="selo"></span>
+        </div>
+        <div class="barra"><div id="pst-barra"></div></div>
+        <p id="atualizado" class="mudo"></p>
+      </div>
+      <dl class="numeros">
+        <div><dt>Eleitorado</dt><dd id="n-e">–</dd></div>
+        <div><dt>Comparecimento</dt><dd id="n-c">–</dd></div>
+        <div><dt>Abstenção</dt><dd id="n-a">–</dd></div>
+        <div><dt>Válidos</dt><dd id="n-vv">–</dd></div>
+        <div><dt>Brancos</dt><dd id="n-vb">–</dd></div>
+        <div><dt>Nulos</dt><dd id="n-vn">–</dd></div>
+      </dl>
+    </section>
+
+    <section id="aviso" class="aviso" hidden></section>
+    <ol id="candidatos" class="candidatos"></ol>
+  </main>
+
+  <footer class="wrap rodape">
+    <p>Fonte: <a href="https://resultados.tse.jus.br/" rel="noopener">Tribunal Superior Eleitoral</a>. A página se atualiza sozinha a cada 30 segundos. Percentuais calculados sobre votos válidos.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
