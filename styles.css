@@ -207,8 +207,85 @@ body {
 
 @media (max-width: 520px) {
   .topo h1 { font-size: 1.3rem; }
+  .cargos { display: grid; grid-template-columns: 1fr 1fr; overflow: visible; }
+  .cargos button { padding: 9px 6px; }
+  .tabela { font-size: 0.82rem; }
+  .tabela th, .tabela td { padding: 6px 5px; }
+  .manchete { font-size: 1.2rem; }
   .numeros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .candidatos li { grid-template-columns: 44px minmax(0, 1fr) auto; }
   .foto { width: 44px; height: 44px; }
   .relogio { margin-left: 0; width: 100%; }
 }
+
+[hidden] { display: none !important; }
+
+/* Quem está ganhando */
+.destaque {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--muted);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.destaque.eleito { border-left-color: var(--elected); }
+.destaque.turno2 { border-left-color: var(--second); }
+.destaque.parcial { border-left-color: var(--accent-2); }
+.destaque-topo { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.destaque .rotulo { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
+.selo-fonte {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+.selo-fonte.oficial { background: var(--elected); color: #fff; }
+.manchete { margin: 8px 0 4px; font-size: 1.35rem; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.explica { margin: 0; color: var(--text); }
+.destaque-compacto { margin-bottom: 0; }
+.destaque-compacto .manchete { font-size: 1.15rem; }
+
+.candidatos li.frente .barra > div { background: var(--accent-2); }
+.tag.frente { background: var(--accent-2); color: #2a2200; }
+.tag.parcial { background: var(--accent-2); color: #2a2200; }
+.tag.aguardando { background: var(--bar-bg); color: var(--muted); }
+
+/* Blocos, tabelas e listas */
+.bloco {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+.bloco h2 { margin: 0 0 6px; font-size: 1.15rem; }
+.bloco h2 small { font-weight: 400; color: var(--muted); font-size: 0.85rem; }
+.bloco h3 { margin: 18px 0 6px; font-size: 1rem; }
+.tabela-rolagem { overflow-x: auto; margin-top: 10px; }
+.tabela { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.tabela th, .tabela td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.tabela th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 600; white-space: nowrap; }
+.tabela td small { color: var(--muted); white-space: nowrap; display: block; }
+.tabela .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tabela .destaque-col { font-weight: 700; }
+.tabela tbody tr[data-uf] { cursor: pointer; }
+.tabela tbody tr[data-uf]:hover, .tabela tbody tr[data-uf]:focus { background: var(--bg); outline: none; }
+.tabela .tag { margin: 3px 0 0; white-space: normal; border-radius: 6px; }
+.lideres { margin: 0; padding-left: 18px; }
+.lideres li { margin: 0 0 2px; }
+.mudo-inline { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lista { margin: 6px 0 0; padding-left: 18px; }
+.lista li { margin: 4px 0; }
+.lista small { color: var(--muted); }
+.fichas li { font-size: 0.88rem; }
+.fichas a { color: var(--second); }
+.conferido { font-size: 0.72rem; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+.conferido.c1 { background: var(--warn-bg); color: var(--warn-text); }
+.conferido.c2, .conferido.c3 { background: var(--elected); color: #fff; }
+
+.rodape h2 { font-size: 1rem; color: var(--text); margin: 0 0 6px; }
+.rodape ul { margin: 0; padding-left: 18px; }
+.rodape li { margin: 6px 0; }

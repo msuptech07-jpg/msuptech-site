@@ -4,58 +4,92 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Apuração Eleições 2026</title>
-  <meta name="description" content="Acompanhe ao vivo a apuração das Eleições 2026 com dados oficiais do TSE: Presidente, Governador e Senador.">
+  <meta name="description" content="Apuração ao vivo das Eleições 2026 com dados oficiais do TSE: quem lidera, quem vence no 1º turno, quem vai ao 2º turno, panorama dos 27 estados e comparação com as pesquisas de véspera.">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="topo">
     <div class="wrap">
       <h1>Apuração <span>Eleições 2026</span></h1>
-      <p class="sub">1º turno · 4 de outubro de 2026 · dados oficiais do TSE</p>
+      <p class="sub">1º turno · 4 de outubro de 2026 · dados oficiais do TSE, atualizados a cada 15 segundos</p>
     </div>
   </header>
 
   <main class="wrap">
     <nav class="cargos" role="tablist" aria-label="Cargo">
+      <button role="tab" data-cargo="panorama">Panorama</button>
       <button role="tab" data-cargo="presidente">Presidente</button>
       <button role="tab" data-cargo="governador">Governador</button>
       <button role="tab" data-cargo="senador">Senador</button>
     </nav>
 
     <div class="filtros">
-      <label for="uf">Abrangência</label>
+      <label for="uf" id="uf-label">Abrangência</label>
       <select id="uf"></select>
-      <button id="atualizar" type="button">Atualizar</button>
-      <span id="relogio" class="relogio" aria-live="polite"></span>
+      <button id="atualizar" type="button">Atualizar agora</button>
+      <span id="relogio" class="relogio" aria-live="off"></span>
     </div>
 
-    <section id="resumo" class="resumo" hidden>
-      <div class="progresso">
-        <div class="progresso-topo">
-          <strong id="pst">0,00%</strong> <span>das seções totalizadas</span>
-          <span id="status" class="selo"></span>
-        </div>
-        <div class="barra"><div id="pst-barra"></div></div>
-        <p id="atualizado" class="mudo"></p>
-      </div>
-      <dl class="numeros">
-        <div><dt>Eleitorado</dt><dd id="n-e">–</dd></div>
-        <div><dt>Comparecimento</dt><dd id="n-c">–</dd></div>
-        <div><dt>Abstenção</dt><dd id="n-a">–</dd></div>
-        <div><dt>Válidos</dt><dd id="n-vv">–</dd></div>
-        <div><dt>Brancos</dt><dd id="n-vb">–</dd></div>
-        <div><dt>Nulos</dt><dd id="n-vn">–</dd></div>
-      </dl>
-    </section>
-
     <section id="aviso" class="aviso" hidden></section>
-    <ol id="candidatos" class="candidatos"></ol>
+
+    <!-- Visão de uma disputa -->
+    <div id="disputa">
+      <section id="destaque" class="destaque" hidden aria-live="polite"></section>
+
+      <section id="resumo" class="resumo" hidden>
+        <div class="progresso">
+          <div class="progresso-topo">
+            <strong id="pst">0,00%</strong> <span>das seções totalizadas</span>
+            <span id="status" class="selo"></span>
+          </div>
+          <div class="barra"><div id="pst-barra"></div></div>
+          <p id="atualizado" class="mudo"></p>
+        </div>
+        <dl class="numeros">
+          <div><dt>Eleitorado</dt><dd id="n-e">–</dd></div>
+          <div><dt>Comparecimento</dt><dd id="n-c">–</dd></div>
+          <div><dt>Abstenção</dt><dd id="n-a">–</dd></div>
+          <div><dt>Válidos</dt><dd id="n-vv">–</dd></div>
+          <div><dt>Brancos</dt><dd id="n-vb">–</dd></div>
+          <div><dt>Nulos</dt><dd id="n-vn">–</dd></div>
+        </dl>
+      </section>
+
+      <ol id="candidatos" class="candidatos"></ol>
+
+      <section id="pesquisas" class="bloco" hidden></section>
+    </div>
+
+    <!-- Panorama nacional -->
+    <div id="panorama" hidden>
+      <section class="bloco">
+        <h2>Presidente</h2>
+        <div id="pan-presidente" class="destaque destaque-compacto"><p class="mudo">Carregando…</p></div>
+      </section>
+      <section class="bloco">
+        <h2>Governadores</h2>
+        <p id="pan-gov-resumo" class="mudo"></p>
+        <div class="tabela-rolagem"><table id="pan-gov" class="tabela"></table></div>
+      </section>
+      <section class="bloco">
+        <h2>Senado <small>(2 vagas por estado)</small></h2>
+        <p id="pan-sen-resumo" class="mudo"></p>
+        <div class="tabela-rolagem"><table id="pan-sen" class="tabela"></table></div>
+      </section>
+    </div>
   </main>
 
   <footer class="wrap rodape">
-    <p>Fonte: <a href="https://resultados.tse.jus.br/" rel="noopener">Tribunal Superior Eleitoral</a>. A página se atualiza sozinha a cada 30 segundos. Percentuais calculados sobre votos válidos.</p>
+    <h2>Fontes e como ler esta página</h2>
+    <ul>
+      <li><strong>Apuração:</strong> arquivos públicos de resultados do <a href="https://resultados.tse.jus.br/" rel="noopener">Tribunal Superior Eleitoral (TSE)</a>, lidos direto do servidor oficial a cada 15 segundos (30 segundos no Panorama). Nada é estimado: os números são os que o TSE publicou.</li>
+      <li><strong>"Oficial TSE"</strong> aparece quando o próprio TSE marca o candidato como eleito ou classificado para o 2º turno. <strong>"Parcial"</strong> mostra o que aconteceria <em>se a apuração terminasse agora</em> e pode mudar até o fim da contagem.</li>
+      <li><strong>Regras:</strong> Presidente e Governador vencem no 1º turno com mais de 50% dos votos válidos; se ninguém alcança, os dois mais votados vão ao 2º turno em 25 de outubro. No Senado não há 2º turno: em 2026 cada estado elege os 2 mais votados.</li>
+      <li><strong>Pesquisas:</strong> pesquisas de véspera registradas no TSE, com os números exatos divulgados pela imprensa (link em cada uma). Pesquisa não é resultado: mostra a intenção de voto naquele momento, com margem de erro.</li>
+    </ul>
   </footer>
 
+  <script src="pesquisas.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
